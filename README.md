@@ -1,94 +1,98 @@
-# Obsidian Sample Plugin
+# 一步维基链接
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+## 介绍
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+> 本插件支持中文和英文界面
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+一步维基链接是一个 Obisidian 插件，它可以让你在编辑器中一步转换当前打开的文档中匹配的维基链接（出链链接）。
 
-## First time developing plugins?
+该插件支持手动转换和自动转换维基链接，并且可以选择排除部分文件或目录，从而避免转换不必要的链接。
 
-Quick starting guide for new plugin devs:
+启用本插件后，出链界面会多出两个新元素：
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+* 当前界面所有潜在的匹配文本（基于插件的匹配规则）
+* 转换按钮，点击该按钮可以将当前界面所有匹配的文本转换为维基链接。
 
-## Releasing new releases
+或者你可以选择使用命令 `Convert All Matching Words to Wiki Links` 来执行转换。（默认快捷键 Mod + R，即 Ctrl + R / Cmd + R）
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+## 自定义设置
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+> 设置面板有具体的使用方式描述
 
-## Adding your plugin to the community plugin list
+* 详情开关：打开或关闭插件的详细信息。
+* 自动转换开关：打开或关闭自动转换维基链接。
+* 非边界字符：用于检测没有边界的字符，如果部分语言匹配出现问题，可以添加该字符以使用非边界正则匹配。
+* 排除文件或目录：输入文件或目录的名称，以逗号分隔，插件将不会转换这些文件或目录中的维基链接。
+* 快捷键：设置快捷键以触发转换命令。
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+## 演示
 
-## How to use
+### 详情和转换
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+![](demo/OneStepWikiLink1.gif)
 
-## Manually installing the plugin
+### 详情开关
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+![](demo/OneStepWikiLink2.gif)
 
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
+### 自动转换
 
-## Funding URL
+![](demo/OneStepWikiLink3.gif)
 
-You can include funding URLs where people who use your plugin can financially support it.
+### 排除文件或目录
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+![](demo/OneStepWikiLink4.gif)
 
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
+### 非边界字符
 
-If you have multiple URLs, you can also do:
+![](demo/OneStepWikiLink5.gif)
 
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
 
-## API Documentation
+# OneStepWikiLink
 
-See https://github.com/obsidianmd/obsidian-api
+## Introduction
+
+> This plugin supports both Chinese and English interfaces
+
+OneStepWikiLink is an Obisidian plugin that allows you to convert matched Wiki links(outlinks) in the current opened document in one step.
+
+The plugin supports manual conversion and automatic conversion of Wiki links, and you can choose to exclude certain files or directories to avoid unnecessary conversions.
+
+After enabling this plugin, there will be two new elements on the outlink interface:
+
+* All potential matches in the current document (based on the plugin's matching rules)
+* The Convert button, which will convert all matched text in the current document to Wiki links.
+
+Or you can use the command `Convert All Matching Words to Wiki Links` to perform the conversion. (The default shortcut is Mod + R, which is Ctrl + R / Cmd + R)
+
+## Customization
+
+> The settings panel has specific usage instructions
+
+* Detail switch: Turn on or off the plugin's detailed information.
+* Auto-conversion switch: Turn on or off automatic conversion of Wiki links.
+* Non-boundary characters: Used to detect characters without boundaries, if some languages have problems with matching, you can add this character to use non-boundary regular expressions.
+* Exclude files or directories: Enter the name of the file or directory separated by commas, and the plugin will not convert Wiki links in these files or directories.
+* Shortcut: Set the shortcut to trigger the conversion command.
+
+## Demo
+
+### Details and Conversion
+
+![](demo/OneStepWikiLink1.gif)
+
+### Detail Switch
+
+![](demo/OneStepWikiLink2.gif)
+
+### Auto-Conversion
+
+![](demo/OneStepWikiLink3.gif)
+
+### Exclude Files or Directories
+
+![](demo/OneStepWikiLink4.gif)
+
+### Non-Boundary Characters
+
+![](demo/OneStepWikiLink5.gif)
