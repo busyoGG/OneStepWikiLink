@@ -218,8 +218,15 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		const contentWithoutLinks = data.replace(/\[\[([^\[\]]+)\]\]/g, "");
 
 		this.fileNameList.forEach(fileName => {
+
+			let regex = new RegExp(`(?<!\\[\\[)${fileName}\\b(?!\\]\\])`, "g");
+			//检测字符串最后一个字符是否为有边界的语言
+			if (this.isNonBoundaryChar(fileName.charAt(fileName.length - 1))) {
+				regex = new RegExp(`(?<!\\[\\[)${fileName}(?!\\]\\])`, "g");
+			}
+
 			// 排除当前文件
-			if (fileName !== this.currentFileName && contentWithoutLinks.includes(fileName)) {
+			if (fileName !== this.currentFileName && regex.exec(contentWithoutLinks) !== null) {
 				this.matchingFiles.push(fileName);
 
 				//添加详情
