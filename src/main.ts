@@ -11,6 +11,7 @@ export enum Language {
 interface OneStepWikiLinkPluginSettings {
 	showDetails: boolean;
 	autoConvert: boolean;
+	autoConvertDelay: number;
 	language: Language;
 	NonBoundaryCheckers: string[];
 	excludes: string[];
@@ -19,6 +20,7 @@ interface OneStepWikiLinkPluginSettings {
 const DEFAULT_SETTINGS: OneStepWikiLinkPluginSettings = {
 	showDetails: true,
 	autoConvert: false,
+	autoConvertDelay: 500,
 	language: Language.CN,
 	NonBoundaryCheckers: ["Han", "Hiragana", "Katakana", "Hangul"],
 	excludes: []
@@ -48,6 +50,8 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 			[Language.EN]: "Convert All to Wiki Links"
 		}
 	}
+
+	autoTimer: NodeJS.Timeout | undefined;
 
 	async onload() {
 		await this.loadSettings();
@@ -152,21 +156,12 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 			this.updateFileNameList((file as TFile).basename, false);
 		}));
 
-		// this.registerEvent(this.app.workspace.on("file-open", async (file) => {
-		// 	// console.log("file open", file);
-		// 	this.openEditor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
-
-		// 	if (file) {
-		// 		this.currentFileName = (file as TFile).basename;
-
-		// 		let content = await this.app.vault.read(file);
-		// 		this.checkContent(content);
-		// 	}
-		// }));
-
-		// console.log(this.fileNameList)
-
-		// this.checkContent();
+		this.registerDomEvent(document.body, "input", () => {
+			clearTimeout(this.autoTimer);
+			this.autoTimer = setTimeout(() => {
+				this.autoConvert2WikiLink();
+			}, this.settings.autoConvertDelay);
+		});
 	}
 
 	getAllFileNames() {
@@ -242,20 +237,20 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		this.matchingFiles.sort((a, b) => a.length > b.length ? -1 : 1);
 
 		if (this.matchingFiles.length > 0) {
-
-			if (this.settings.autoConvert) {
-				this.btnOneStep?.addClass("hide");
-				this.divForDetails?.addClass("hide");
-				this.convert2WikiLink();
-			} else {
-				this.btnOneStep?.removeClass("hide");
-				this.settings.showDetails && this.divForDetails?.removeClass("hide");
-			}
+			this.btnOneStep?.removeClass("hide");
+			this.settings.showDetails && this.divForDetails?.removeClass("hide");
 		} else {
 			this.btnOneStep?.addClass("hide");
 			this.divForDetails?.addClass("hide");
 		}
+	}
 
+	autoConvert2WikiLink() {
+		if (this.settings.autoConvert) {
+			this.btnOneStep?.addClass("hide");
+			this.divForDetails?.addClass("hide");
+			this.convert2WikiLink();
+		}
 	}
 
 	/** 转换所有匹配项为维基链接 */
@@ -337,7 +332,12 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 
 		//保存配置的时候检测是否需要显示目标 Div
 		if (this.matchingFiles.length > 0) {
-			!this.settings.showDetails && this.divForDetails?.removeClass("hide");
+			// !this.settings.showDetails && this.divForDetails?.removeClass("hide");
+			if (this.settings.showDetails) {
+				this.divForDetails?.removeClass("hide");
+			} else {
+				this.divForDetails?.addClass("hide");
+			}
 		} else {
 			this.divForDetails?.addClass("hide");
 		}

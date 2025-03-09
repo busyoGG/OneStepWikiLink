@@ -26,6 +26,16 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
                 [Language.EN]: "Whether to automatically convert all matching content"
             }
         },
+        autoConvertDelay: {
+            name: {
+                [Language.CN]: "自动转换延迟",
+                [Language.EN]: "Auto Convert Delay"
+            },
+            desc: {
+                [Language.CN]: "自动转换延迟，单位为毫秒",
+                [Language.EN]: "Auto Convert Delay, in milliseconds"
+            }
+        },
         NonBoundaryCheckers: {
             name: {
                 [Language.CN]: "非边界字符",
@@ -69,6 +79,7 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
     display(): void {
         let { containerEl } = this;
 
+        this.settings = [];
         containerEl.empty();
 
         new Setting(containerEl)
@@ -116,10 +127,40 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
                             .onChange(async (value) => {
                                 this.plugin.settings.autoConvert = value;
                                 await this.plugin.saveSettings();
+                                if (value) {
+                                    this.settings[2].value.settingEl.removeClass("setting-hide");
+                                } else {
+                                    this.settings[2].value.settingEl.addClass("setting-hide");
+                                }
                             })
                     )
             }
         )
+
+        this.settings.push(
+            {
+                key: this.labels.autoConvertDelay,
+                value: new Setting(containerEl)
+                    .setName(this.labels.autoConvertDelay.name[this.plugin.settings.language])
+                    .setDesc(this.labels.autoConvertDelay.desc[this.plugin.settings.language])
+                    .addText((text) => {
+                        text.inputEl.type = "number";
+                        text
+                            .setValue(this.plugin.settings.autoConvertDelay.toString())
+                            .onChange(async (value) => {
+                                this.plugin.settings.autoConvertDelay = Number(value);
+                                await this.plugin.saveSettings();
+                            })
+                    })
+            }
+        );
+
+        if (this.plugin.settings.autoConvert) {
+            this.settings[2].value.settingEl.removeClass("setting-hide");
+        } else {
+            this.settings[2].value.settingEl.addClass("setting-hide");
+        }
+
 
         this.settings.push(
             {

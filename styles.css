@@ -72,3 +72,7 @@ One Step WikiLink Custome Css
     border-radius: var(--input-radius);
     outline: none;
 }
+
+.setting-hide {
+    display: none;
+}
