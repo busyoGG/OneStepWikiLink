@@ -1,0 +1,11 @@
+{
+	"id": "one-step-wiki-link",
+	"name": "One Step Wiki Link",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "一步添加 wiki 链接",
+	"author": "Obsidian",
+	"authorUrl": "https://obsidian.md",
+	"fundingUrl": "https://obsidian.md/pricing",
+	"isDesktopOnly": false
+}
