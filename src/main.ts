@@ -124,14 +124,10 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		this.addCommand({
 			id: "convert-all-matching-words-to-wiki-links",
 			name: "Convert All Matching Words to Wiki Links",
-			editorCallback: (editor) => {
-				this.convert2WikiLink();
-			}
-		});
-
-		this.addCommand({
-			id: "convert-all-matching-words-to-wiki-links-cn",
-			name: "转换所有匹配的单词为维基链接",
+			hotkeys: [{
+				modifiers: ['Mod'],
+				key: 'r'
+			}],
 			editorCallback: (editor) => {
 				this.convert2WikiLink();
 			}
@@ -168,7 +164,7 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		// 	}
 		// }));
 
-		console.log(this.fileNameList)
+		// console.log(this.fileNameList)
 
 		// this.checkContent();
 	}
