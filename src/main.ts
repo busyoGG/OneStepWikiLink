@@ -119,19 +119,20 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		this.openEditor = this.app.workspace.getActiveViewOfType(MarkdownView)?.editor;
 
 		if (file && this.openEditor) {
-			this.currentFileName = (file as TFile).basename;
-
-			let content = await this.app.vault.read(file);
-			this.checkContent(content);
+			if (file instanceof TFile) {
+				this.currentFileName = file.basename;
+				let content = await this.app.vault.read(file);
+				this.checkContent(content);
+			}
 		}
 
 		this.addCommand({
 			id: "convert-all-matching-words-to-wiki-links",
 			name: "Convert All Matching Words to Wiki Links",
-			hotkeys: [{
-				modifiers: ['Mod'],
-				key: 'r'
-			}],
+			// hotkeys: [{
+			// 	modifiers: ['Mod'],
+			// 	key: 'r'
+			// }],
 			editorCallback: (editor) => {
 				this.convert2WikiLink();
 			}
@@ -141,19 +142,22 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		//监听文本变化
 		this.registerEvent(this.app.workspace.on("editor-change", async (file, data) => {
 			// console.log(file, data);
-			if (file) {
-				this.currentFileName = (data.file as TFile).basename;
-				// console.log(file.getValue());
+			if (file && data.file instanceof TFile) {
+				this.currentFileName = data.file.basename;
 				this.checkContent(file.getValue());
 			}
 		}));
 
 		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
-			this.updateFileNameList((file as TFile).basename, true, oldPath.replace(".md", ""));
+			if (file && file instanceof TFile) {
+				this.updateFileNameList(file.basename, true, oldPath.replace(".md", ""));
+			}
 		}));
 
 		this.registerEvent(this.app.vault.on("delete", (file) => {
-			this.updateFileNameList((file as TFile).basename, false);
+			if (file && file instanceof TFile) {
+				this.updateFileNameList(file.basename, false);
+			}
 		}));
 
 		this.registerDomEvent(document.body, "input", () => {

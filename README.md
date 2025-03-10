@@ -13,7 +13,7 @@
 * 当前界面所有潜在的匹配文本（基于插件的匹配规则）
 * 转换按钮，点击该按钮可以将当前界面所有匹配的文本转换为维基链接。
 
-或者你可以选择使用命令 `Convert All Matching Words to Wiki Links` 来执行转换。（默认快捷键 Mod + R，即 Ctrl + R / Cmd + R）
+或者你可以选择使用命令 `Convert All Matching Words to Wiki Links` 来执行转换。
 
 ## 自定义设置
 
@@ -63,7 +63,7 @@ After enabling this plugin, there will be two new elements on the outlink interf
 * All potential matches in the current document (based on the plugin's matching rules)
 * The Convert button, which will convert all matched text in the current document to Wiki links.
 
-Or you can use the command `Convert All Matching Words to Wiki Links` to perform the conversion. (The default shortcut is Mod + R, which is Ctrl + R / Cmd + R)
+Or you can use the command `Convert All Matching Words to Wiki Links` to perform the conversion. 
 
 ## Customization
 
