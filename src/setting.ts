@@ -9,7 +9,7 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
         details: {
             name: {
                 [Language.CN]: "详情开关",
-                [Language.EN]: "Details Switch"
+                [Language.EN]: "Details switch"
             },
             desc: {
                 [Language.CN]: "是否显示所有匹配的内容",
@@ -19,7 +19,7 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
         autoConvert: {
             name: {
                 [Language.CN]: "自动转换开关",
-                [Language.EN]: "Auto Convert Switch"
+                [Language.EN]: "Auto convert switch"
             },
             desc: {
                 [Language.CN]: "是否自动转换所有匹配的内容",
@@ -29,27 +29,27 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
         autoConvertDelay: {
             name: {
                 [Language.CN]: "自动转换延迟",
-                [Language.EN]: "Auto Convert Delay"
+                [Language.EN]: "Auto convert delay"
             },
             desc: {
                 [Language.CN]: "自动转换延迟，单位为毫秒",
-                [Language.EN]: "Auto Convert Delay, in milliseconds"
+                [Language.EN]: "Auto convert delay, in milliseconds"
             }
         },
         NonBoundaryCheckers: {
             name: {
                 [Language.CN]: "非边界字符",
-                [Language.EN]: "Non-Boundary Characters"
+                [Language.EN]: "Non-boundary characters"
             },
             desc: {
                 [Language.CN]: "用于检测没有边界的字符，如汉字，以 `，` 或 `,` 分隔，值为正则表达式的 `Script=Han` 形式中的 Han 部分",
-                [Language.EN]: "Used to detect characters without boundaries, such as Chinese characters, separated by `，` or `,` , and the `Script=Han` part of the regular expression"
+                [Language.EN]: "Used to detect characters without boundaries, such as chinese characters, separated by `，` or `,` , and the `Script=Han` part of the regular expression"
             }
         },
         excludes: {
             name: {
                 [Language.CN]: "排除列表",
-                [Language.EN]: "Exclude List"
+                [Language.EN]: "Exclude list"
             },
             desc: {
                 [Language.CN]: "不检测排除列表中的文件，以 `，` 或 `,` 分隔，不带后缀，排除文件夹需要输入文件夹的相对路径并以 `/` 结尾",
