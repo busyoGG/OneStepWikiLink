@@ -135,6 +135,18 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 			}
 		});
 
+		this.addCommand({
+			id: "convert-all-matching-words-to-wiki-links-zh",
+			name: "转换所有匹配的文本为维基链接",
+			// hotkeys: [{
+			// 	modifiers: ['Mod'],
+			// 	key: 'r'
+			// }],
+			editorCallback: (editor) => {
+				this.convert2WikiLink();
+			}
+		});
+
 
 		//监听文本变化
 		this.registerEvent(this.app.workspace.on("editor-change", async (file, data) => {
