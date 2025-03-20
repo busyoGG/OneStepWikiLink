@@ -1,18 +1,12 @@
-import { Editor, MarkdownFileInfo, MarkdownView, Plugin, TFile, View } from "obsidian";
+import { Editor, MarkdownView, normalizePath, Plugin, TFile } from "obsidian";
 import { OneStepWikiLinkPluginSettingTab } from "./setting";
+import { Localization } from "./localization";
 
-const path = require("path");
-
-export enum Language {
-	CN = "CN",
-	EN = "EN"
-}
 
 interface OneStepWikiLinkPluginSettings {
 	showDetails: boolean;
 	autoConvert: boolean;
 	autoConvertDelay: number;
-	language: Language;
 	NonBoundaryCheckers: string[];
 	excludes: string[];
 }
@@ -21,9 +15,12 @@ const DEFAULT_SETTINGS: OneStepWikiLinkPluginSettings = {
 	showDetails: true,
 	autoConvert: false,
 	autoConvertDelay: 500,
-	language: Language.CN,
 	NonBoundaryCheckers: ["Han", "Hiragana", "Katakana", "Hangul"],
 	excludes: []
+}
+
+interface LabelDictionary {
+	[key: string]: string; // 任意字符串键，对应的值必须是字符串
 }
 
 export default class OneStepWikiLinkPlugin extends Plugin {
@@ -44,14 +41,14 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 
 	matchingFiles: string[] = [];
 
-	labels = {
+	labels: Record<string, LabelDictionary> = {
 		btnOneStep: {
-			[Language.CN]: "全部转换为维基链接",
-			[Language.EN]: "Convert All to Wiki Links"
+			"zh": "全部转换为维基链接",
+			"en": "Convert All to Wiki Links"
 		}
 	}
 
-	autoTimer: NodeJS.Timeout | undefined;
+	autoTimer: number;
 
 	async onload() {
 		await this.loadSettings();
@@ -128,7 +125,7 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 
 		this.addCommand({
 			id: "convert-all-matching-words-to-wiki-links",
-			name: "Convert All Matching Words to Wiki Links",
+			name: "Convert all matching words to wiki links",
 			// hotkeys: [{
 			// 	modifiers: ['Mod'],
 			// 	key: 'r'
@@ -161,8 +158,8 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		}));
 
 		this.registerDomEvent(document.body, "input", () => {
-			clearTimeout(this.autoTimer);
-			this.autoTimer = setTimeout(() => {
+			this.autoTimer && window.clearTimeout(this.autoTimer);
+			this.autoTimer = window.setTimeout(() => {
 				this.autoConvert2WikiLink();
 			}, this.settings.autoConvertDelay);
 		});
@@ -177,7 +174,9 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 			let checkFileName = this.settings.excludes.includes(file.basename);
 			let checkFilePath;
 			for (let exclude of this.settings.excludes) {
-				let filePath = path.dirname(file.path) + "/";
+				let normalizedPath = normalizePath(file.path);
+				let dirname = normalizedPath.substring(0, normalizedPath.lastIndexOf('/'));
+				let filePath = dirname + "/";
 				if (exclude.endsWith("/") && filePath.startsWith(exclude)) {
 					checkFilePath = true;
 					break;
@@ -303,11 +302,13 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 	}
 
 	createButton(root: Element) {
+		let language = Localization.getLang();
+
 		let container = root.querySelector(".outgoing-link-pane");
 		if (container) {
 			this.btnOneStep = container.createDiv({
 				cls: "one-step-wikilink-container-busyo",
-				text: this.labels.btnOneStep[this.settings.language]
+				text: this.labels.btnOneStep[language]
 			});
 			container.insertBefore(this.btnOneStep, container.firstChild);
 
@@ -345,9 +346,6 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		} else {
 			this.divForDetails?.addClass("hide");
 		}
-
-		//更改语言
-		this.btnOneStep?.setText(this.labels.btnOneStep[this.settings.language]);
 
 		//更新文件列表
 		this.getAllFileNames();

@@ -1,74 +1,76 @@
 import OneStepWikiLinkPlugin from "src/main";
-import { App, PluginSettingTab, Setting, View, WorkspaceLeaf } from "obsidian";
-import { Language } from "src/main";
+import { App, PluginSettingTab, Setting } from "obsidian";
+import { Localization } from "./localization";
+
+interface LabelDictionary {
+    [key: string]: string; // 任意字符串键，对应的值必须是字符串
+}
+
+interface LabelEntry {
+    name: LabelDictionary;
+    desc: LabelDictionary;
+}
+
 
 export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
     plugin: OneStepWikiLinkPlugin;
 
-    labels = {
+    labels: Record<string, LabelEntry> = {
         details: {
             name: {
-                [Language.CN]: "详情开关",
-                [Language.EN]: "Details switch"
+                "zh": "详情开关",
+                "en": "Details switch"
             },
             desc: {
-                [Language.CN]: "是否显示所有匹配的内容",
-                [Language.EN]: "Whether to display all matching content"
+                "zh": "是否显示所有匹配的内容",
+                "en": "Whether to display all matching content"
             }
         },
         autoConvert: {
             name: {
-                [Language.CN]: "自动转换开关",
-                [Language.EN]: "Auto convert switch"
+                "zh": "自动转换开关",
+                "en": "Auto convert switch"
             },
             desc: {
-                [Language.CN]: "是否自动转换所有匹配的内容",
-                [Language.EN]: "Whether to automatically convert all matching content"
+                "zh": "是否自动转换所有匹配的内容",
+                "en": "Whether to automatically convert all matching content"
             }
         },
         autoConvertDelay: {
             name: {
-                [Language.CN]: "自动转换延迟",
-                [Language.EN]: "Auto convert delay"
+                "zh": "自动转换延迟",
+                "en": "Auto convert delay"
             },
             desc: {
-                [Language.CN]: "自动转换延迟，单位为毫秒",
-                [Language.EN]: "Auto convert delay, in milliseconds"
+                "zh": "自动转换延迟，单位为毫秒",
+                "en": "Auto convert delay, in milliseconds"
             }
         },
         NonBoundaryCheckers: {
             name: {
-                [Language.CN]: "非边界字符",
-                [Language.EN]: "Non-boundary characters"
+                "zh": "非边界字符",
+                "en": "Non-boundary characters"
             },
             desc: {
-                [Language.CN]: "用于检测没有边界的字符，如汉字，以 `，` 或 `,` 分隔，值为正则表达式的 `Script=Han` 形式中的 Han 部分",
-                [Language.EN]: "Used to detect characters without boundaries, such as chinese characters, separated by `，` or `,` , and the `Script=Han` part of the regular expression"
+                "zh": "用于检测没有边界的字符，如汉字，以 `，` 或 `,` 分隔，值为正则表达式的 `Script=Han` 形式中的 Han 部分",
+                "en": "Used to detect characters without boundaries, such as chinese characters, separated by `，` or `,` , and the `Script=Han` part of the regular expression"
             }
         },
         excludes: {
             name: {
-                [Language.CN]: "排除列表",
-                [Language.EN]: "Exclude list"
+                "zh": "排除列表",
+                "en": "Exclude list"
             },
             desc: {
-                [Language.CN]: "不检测排除列表中的文件，以 `，` 或 `,` 分隔，不带后缀，排除文件夹需要输入文件夹的相对路径并以 `/` 结尾",
-                [Language.EN]: "Do not check files in the exclude list, separated by `，` or `,`, without suffix, exclude folders need to enter the relative path of the folder and end with `/`"
+                "zh": "不检测排除列表中的文件，以 `，` 或 `,` 分隔，不带后缀，排除文件夹需要输入文件夹的相对路径并以 `/` 结尾",
+                "en": "Do not check files in the exclude list, separated by `，` or `,`, without suffix, exclude folders need to enter the relative path of the folder and end with `/`"
             }
         }
     };
 
     settings: {
-        key: {
-            name: {
-                CN: string;
-                EN: string;
-            };
-            desc: {
-                CN: string;
-                EN: string;
-            };
-        }; value: Setting;
+        key: LabelEntry;
+        value: Setting;
     }[] = [];
 
     constructor(app: App, plugin: OneStepWikiLinkPlugin) {
@@ -82,28 +84,14 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
         this.settings = [];
         containerEl.empty();
 
-        new Setting(containerEl)
-            .setName("语言 Language")
-            .setDesc("选择语言 Choose language")
-            .addDropdown((dropdown) =>
-                dropdown
-                    .addOption("CN", "CN")
-                    .addOption("EN", "EN")
-                    .setValue(this.plugin.settings.language)
-                    .onChange(async (value) => {
-                        this.plugin.settings.language = value as Language;
-                        await this.plugin.saveSettings();
-
-                        this.updateLanguage();
-                    })
-            );
+        let language = Localization.getLang();
 
         this.settings.push(
             {
                 key: this.labels.details,
                 value: new Setting(containerEl)
-                    .setName(this.labels.details.name[this.plugin.settings.language])
-                    .setDesc(this.labels.details.desc[this.plugin.settings.language])
+                    .setName(this.labels.details.name[language])
+                    .setDesc(this.labels.details.desc[language])
                     .addToggle((toggle) =>
                         toggle
                             .setValue(this.plugin.settings.showDetails)
@@ -119,8 +107,8 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
             {
                 key: this.labels.autoConvert,
                 value: new Setting(containerEl)
-                    .setName(this.labels.autoConvert.name[this.plugin.settings.language])
-                    .setDesc(this.labels.autoConvert.desc[this.plugin.settings.language])
+                    .setName(this.labels.autoConvert.name[language])
+                    .setDesc(this.labels.autoConvert.desc[language])
                     .addToggle((toggle) =>
                         toggle
                             .setValue(this.plugin.settings.autoConvert)
@@ -141,8 +129,8 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
             {
                 key: this.labels.autoConvertDelay,
                 value: new Setting(containerEl)
-                    .setName(this.labels.autoConvertDelay.name[this.plugin.settings.language])
-                    .setDesc(this.labels.autoConvertDelay.desc[this.plugin.settings.language])
+                    .setName(this.labels.autoConvertDelay.name[language])
+                    .setDesc(this.labels.autoConvertDelay.desc[language])
                     .addText((text) => {
                         text.inputEl.type = "number";
                         text
@@ -166,8 +154,8 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
             {
                 key: this.labels.NonBoundaryCheckers,
                 value: new Setting(containerEl)
-                    .setName(this.labels.NonBoundaryCheckers.name[this.plugin.settings.language])
-                    .setDesc(this.labels.NonBoundaryCheckers.desc[this.plugin.settings.language])
+                    .setName(this.labels.NonBoundaryCheckers.name[language])
+                    .setDesc(this.labels.NonBoundaryCheckers.desc[language])
             }
         );
 
@@ -184,8 +172,8 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
             {
                 key: this.labels.excludes,
                 value: new Setting(containerEl)
-                    .setName(this.labels.excludes.name[this.plugin.settings.language])
-                    .setDesc(this.labels.excludes.desc[this.plugin.settings.language])
+                    .setName(this.labels.excludes.name[language])
+                    .setDesc(this.labels.excludes.desc[language])
             }
         );
 
@@ -200,9 +188,10 @@ export class OneStepWikiLinkPluginSettingTab extends PluginSettingTab {
     }
 
     updateLanguage() {
+        let language = Localization.getLang();
         for (let setting of this.settings) {
-            setting.value.setName(setting.key.name[this.plugin.settings.language]);
-            setting.value.setDesc(setting.key.desc[this.plugin.settings.language]);
+            setting.value.setName(setting.key.name[language]);
+            setting.value.setDesc(setting.key.desc[language]);
         }
     }
 }
