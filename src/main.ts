@@ -102,6 +102,8 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 					this.openEditor = leaf.view.app.workspace.activeEditor?.editor;
 					// console.log(this.openEditor);
 					if (this.openEditor) {
+						this.currentFileName = ((leaf.view as MarkdownView).file as TFile).basename;
+						// console.log((leaf.view as MarkdownView).file?.basename);
 						this.checkContent(this.openEditor.getValue());
 					}
 				} else if (type == "empty") {
