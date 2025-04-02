@@ -161,7 +161,8 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 
 		this.registerEvent(this.app.vault.on("rename", (file, oldPath) => {
 			if (file && file instanceof TFile) {
-				this.updateFileNameList(file.basename, true, oldPath.replace(".md", ""));
+				let fileName = oldPath.substring(oldPath.lastIndexOf('/') + 1).replace(".md", "");
+				this.updateFileNameList(file.basename, true, fileName);
 			}
 		}));
 
