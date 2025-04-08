@@ -1,6 +1,7 @@
-import { Editor, MarkdownView, normalizePath, Plugin, TFile } from "obsidian";
+import { Editor, EditorPosition, MarkdownView, normalizePath, Plugin, TFile } from "obsidian";
 import { OneStepWikiLinkPluginSettingTab } from "./setting";
 import { Localization } from "./localization";
+import { start } from "repl";
 
 
 interface OneStepWikiLinkPluginSettings {
@@ -204,6 +205,8 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 
 			this.fileNameList.push(file.basename);
 		}
+
+		this.fileNameList.sort((a, b) => a.length > b.length ? -1 : 1);
 	}
 
 	updateFileNameList(name: string, add: boolean, extra: string = "") {
@@ -228,18 +231,19 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 			this.divForDetails.empty();
 		}
 
-		const contentWithoutLinks = data.replace(/\[\[([^\[\]]+)\]\]/g, "");
+		let contentWithoutLinks = data.replace(/\[\[([^\[\]]+)\]\]/g, "");
 
 		this.fileNameList.forEach(fileName => {
 
-			let regex = new RegExp(`(?<!\\[\\[)${fileName}\\b(?!\\]\\])`, "g");
+			let regex = new RegExp(`${fileName}\\b`, "g");
 			//检测字符串最后一个字符是否为有边界的语言
 			if (this.isNonBoundaryChar(fileName.charAt(fileName.length - 1))) {
-				regex = new RegExp(`(?<!\\[\\[)${fileName}(?!\\]\\])`, "g");
+				regex = new RegExp(`${fileName}`, "g");
 			}
 
+			const newContent = contentWithoutLinks.replace(regex, "");
 			// 排除当前文件
-			if (fileName !== this.currentFileName && regex.exec(contentWithoutLinks) !== null) {
+			if (fileName !== this.currentFileName && newContent !== contentWithoutLinks) {
 				this.matchingFiles.push(fileName);
 
 				//添加详情
@@ -249,6 +253,8 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 						text: fileName
 					});
 				}
+
+				contentWithoutLinks = newContent;
 			}
 		});
 
@@ -276,6 +282,7 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 		if (this.openEditor) {
 			let data = this.openEditor.getValue();
 
+			let rawChanges: { start: number; end: number; change: { from: EditorPosition, to: EditorPosition, text: string } }[] = [];
 			let changes = [];
 
 			for (const match of this.matchingFiles) {
@@ -291,13 +298,25 @@ export default class OneStepWikiLinkPlugin extends Plugin {
 					let pos = this.openEditor.offsetToPos(res.index);
 					let endPos = { ch: pos.ch + match.length, line: pos.line };
 
-					changes.push({
-						from: pos,
-						to: endPos,
-						text: `[[${match}]]`
+					rawChanges.push({
+						start: res.index,
+						end: res.index + match.length,
+						change: {
+							from: pos,
+							to: endPos,
+							text: `[[${match}]]`
+						}
 					});
+				}
+			}
 
-					// data = data.replace(regex, `[[${match}]]`);
+			rawChanges.sort((a, b) => a.start - b.start);
+
+			let endIndex = -1;
+			for (let raw of rawChanges) {
+				if (raw.start >= endIndex) {
+					changes.push(raw.change);
+					endIndex = raw.end;
 				}
 			}
 
